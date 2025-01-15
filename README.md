@@ -22,6 +22,10 @@ git clone git@github.com:duynamrcv/turtlebot3_swarm.git
 cd ~/turtlebot3_ws/
 colcon build --symlink-install
 ```
+The Python scripts must be executable. Run the following command to make sure:
+```
+chmod +x <path/to/script/folder>/<node_name>.py
+```
 
 ## Demo
 ### Launch the empty environment with 1 Waffle robots

@@ -29,8 +29,8 @@ class globalReference:
         sensing_map = self.scanDataToMapArray(scan, rows, cols)
         target = self.worldToMap(position, goal, rows, cols)
 
-        # TO DO: Run JPS to find the path to goal
-        # TO DO: Split path to get n point
+        # TODO: Run JPS to find the path to goal
+        # TODO: Split path to get n point
 
     def worldToMap(self, position:np.array, goal:np.array, rows:int, cols:int):
         mx = int(goal[0] - position[0])/self.disc_size + cols/2
