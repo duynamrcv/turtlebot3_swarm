@@ -63,4 +63,5 @@ class MPC():
         sol = self.opti.solve()
 
         action = sol.value(self.opt_action)[:,0]
-        return action
+        states = sol.value(self.opt_states)
+        return action, states

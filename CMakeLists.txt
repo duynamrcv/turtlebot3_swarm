@@ -32,7 +32,6 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  ${PROJECT_NAME}/turtlebot3_controller.py
   ${PROJECT_NAME}/control_node.py
   DESTINATION lib/${PROJECT_NAME}/
 )

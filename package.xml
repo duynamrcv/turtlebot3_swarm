@@ -4,7 +4,7 @@
   <name>turtlebot3_swarm</name>
   <version>0.1.0</version>
   <description>ROS2 Turtlebot3 Waffle swarm simulation in Gazebo.</description>
-  <maintainer email="duynam.robotics@gmail.com">Duy Nam Bui</maintainer>
+  <maintainer email="duynam.robotics@gmail.com">Duy-Nam Bui</maintainer>
   <license file="LICENSE">MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
