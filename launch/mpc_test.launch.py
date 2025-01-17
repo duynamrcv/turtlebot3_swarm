@@ -106,9 +106,10 @@ def generate_launch_description():
             name='controller'+str(index),
             parameters=[{
                 'name': robot_prefix,
-                'max_v': 0.5,
+                'max_v': 0.3,
                 'max_w': np.pi/3,
-                'threshold': 0.2
+                'threshold': 0.2,
+                'horizon': 50
             }],
         )
 
