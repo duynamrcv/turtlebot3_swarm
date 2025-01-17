@@ -7,8 +7,8 @@ from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Odometry, Path
 import numpy as np
 
-from turtlebot3_swarm.mpc_controller import MPC
-from turtlebot3_swarm.utils import *
+from mpc_controller import MPC
+from utils import *
 
 class ControlState:
     IDLE = 1
@@ -21,8 +21,9 @@ class MPCNode(Node):
         self.rate = 10  # Hz
         self.name = self.declare_parameter('name', 'turtlebot3').get_parameter_value().string_value
         self.max_v = self.declare_parameter('max_v', 0.3).get_parameter_value().double_value
-        self.max_w = self.declare_parameter('max_w', np.pi/6).get_parameter_value().double_value
+        self.max_w = self.declare_parameter('max_w', np.pi/3).get_parameter_value().double_value
         self.N = self.declare_parameter('horizon', 10).get_parameter_value().integer_value
+        self.threshold = self.declare_parameter('goal_threshold', 0.1).get_parameter_value().double_value
         
         self.subscriber_goal = self.create_subscription(PoseStamped, '/goal_pose', self.goal_callback, self.rate)
         self.subscriber_odometry = self.create_subscription(Odometry, '{}/odom'.format(self.name), self.odom_callback, self.rate)
@@ -36,7 +37,6 @@ class MPCNode(Node):
                        hoziron_length=self.N, time_step=1.0/self.rate)
         
         self.frame_id = ""
-        self.goal_queue = []
         self.goal = None
         self.pose = None
         self.state = ControlState.IDLE
@@ -46,7 +46,7 @@ class MPCNode(Node):
         gx = msg.pose.position.x
         gy = msg.pose.position.y
         _, _, gtheta = euler_from_quaternion(msg.pose.orientation)
-        self.goal_queue.append(np.array([gx, gy, gtheta]))
+        self.goal = np.array([gx, gy, gtheta])
 
     def odom_callback(self, msg:Odometry):
         px = msg.pose.pose.position.x
@@ -77,9 +77,10 @@ class MPCNode(Node):
     def publish_local_path(self, states):
         path = Path()
         path.header.frame_id = self.frame_id
-        path.header.stamp = self.get_clock().now()
         if states is not None:
-            for state in states:
+            length = states.shape[1]
+            for i in range(length):
+                state = states[:,i]
                 pose = PoseStamped()
                 pose.pose.position.x = state[0]
                 pose.pose.position.y = state[1]
@@ -90,8 +91,7 @@ class MPCNode(Node):
 
     def handle_idle_state(self):
         self.get_logger().info("Handle IDLE state")
-        if self.goal is None and self.goal_queue != []:
-            self.goal = self.goal_queue.pop(0)
+        if self.goal is not None:
             self.get_logger().info("Moving to the target at x={}, y={}, \
                                    theta={}".format(self.goal[0], self.goal[1], self.goal[2]))
             self.state = ControlState.TRACKING
@@ -100,7 +100,7 @@ class MPCNode(Node):
     
     def handle_tracking_state(self):
         self.get_logger().info("Handle TRACKING state")
-        if np.linalg.norm(self.goal - self.pose) < 0.05:
+        if np.linalg.norm(self.goal - self.pose) < self.threshold:
             action = np.array([0., 0.])
             states = None
             self.state = ControlState.FINISHING
@@ -117,12 +117,10 @@ class MPCNode(Node):
 
 
 if __name__ == '__main__':
-    try:
-        rclpy.init(args=None)
-        controller = MPCNode()
-        rclpy.spin(controller)
+    rclpy.init(args=None)
+    controller = MPCNode()
+    rclpy.spin(controller)
 
-    except:
-        controller.destroy_node()
-        rclpy.shutdown()
+    controller.destroy_node()
+    rclpy.shutdown()
 

@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -105,9 +106,9 @@ def generate_launch_description():
             name='controller'+str(index),
             parameters=[{
                 'name': robot_prefix,
-                # 'k_rho': 0.9,
-                # 'k_alpha': 1.5,
-                # 'k_beta': -0.8
+                'max_v': 0.5,
+                'max_w': np.pi/3,
+                'threshold': 0.2
             }],
         )
 

@@ -31,10 +31,16 @@ include_directories(
 ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
+file(GLOB_RECURSE PYTHON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/*.py")
+foreach(py_file ${PYTHON_FILES})
+  execute_process(COMMAND "chmod" "+x" "${py_file}")
+endforeach()
+
 install(PROGRAMS
-  ${PROJECT_NAME}/control_node.py
+  ${PYTHON_FILES}
   DESTINATION lib/${PROJECT_NAME}/
 )
+
 
 # Instal C++ files
 add_executable(move_to_target_node src/main.cpp src/SimpleController.cpp)
