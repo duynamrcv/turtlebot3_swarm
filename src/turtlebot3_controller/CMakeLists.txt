@@ -23,10 +23,6 @@ find_package(std_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2 REQUIRED)
 
-include_directories(
-  include
-)
-
 # Install Python modules
 ament_python_install_package("src")
 
@@ -40,19 +36,5 @@ install(PROGRAMS
   ${PYTHON_FILES}
   DESTINATION lib/${PROJECT_NAME}/
 )
-
-
-# Instal C++ files
-add_executable(move_to_target_node src/main.cpp src/SimpleController.cpp)
-ament_target_dependencies(move_to_target_node rclcpp std_msgs tf2 geometry_msgs nav_msgs)
-
-install(TARGETS
-  move_to_target_node
-  DESTINATION lib/${PROJECT_NAME})
-
-# install(DIRECTORY launch meshes urdf worlds models rviz
-#   DESTINATION share/${PROJECT_NAME}/
-# )
-
 
 ament_package()
